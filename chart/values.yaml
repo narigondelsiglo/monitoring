@@ -1,0 +1,117 @@
+global:
+  clusterName: my-cluster
+  domain: example.com
+
+loki:
+  enabled: false
+  loki:
+    structuredConfig:
+      limits_config:
+        volume_enabled: true
+
+kube-prometheus-stack:
+  alertmanager:
+    enabled: false
+  kubernetesServiceMonitors:
+    enabled: true
+  # defaultRules:
+  #   disabled: {}
+  #   # KubeAPIDown: true
+  #   # NodeRAIDDegraded: true
+  nodeExporter:
+    operatingSystems:
+      darwin:
+        enabled: false
+  grafana:
+    defaultDashboardsTimezone: browser
+    adminPassword: "1234*"
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+          - name: Loki
+            uid: loki
+            type: loki
+            url: http://loki-loki-distributed-gateway
+            isDefault: false
+    ingress:
+      enabled: true
+      # annotations:
+      #   cert-manager.io/cluster-issuer: default
+      hosts:
+      - grafana.{{ include "domain" . }}
+      paths:
+        - /
+      tls:
+      - secretName: grafana-general-tls
+        hosts:
+        - grafana.{{ include "domain" . }}
+  prometheus:
+    ingress:
+      enabled: true
+      # annotations:
+      #   cert-manager.io/cluster-issuer: default
+      #   traefik.ingress.kubernetes.io/router.middlewares: kube-system-authentik@kubernetescrd
+      hosts:
+      - prometheus.{{ include "domain" . }}
+      paths:
+        - /
+      tls:
+      - secretName: prometheus-general-tls
+        hosts:
+        - prometheus.{{ include "domain" . }}
+  prometheusOperator:
+    tls:
+      enabled: false
+    admissionWebhooks:
+      enabled: false
+    # admissionWebhooks:
+    #   certManager:
+    #     enabled: true
+    #     issuerRef:
+    #       name: "default"
+    #       kind: "ClusterIssuer"
+  extraManifests: []
+
+
+
+k8s-monitoring:
+  cluster:
+    name: {{ include "cluster.name" . }}
+
+  metrics:
+    cadvisor:
+      enabled: false
+    cost:
+      enabled: false
+    # apiserver:
+    #   enabled: true
+
+  prometheus-operator-crds:
+    enabled: false
+  externalServices:
+    prometheus:
+      host: "http://prometheus-kube-prometheus-prometheus"
+    loki:
+      host: "http://loki-loki-distributed-gateway"
+  logs:
+    pod_logs:
+      excludeNamespaces: []
+      extraRelabelingRules: ""
+      gatherMethod: "volumes"
+      extraStageBlocks: ""
+    extraConfig: ""
+  # traces:
+  #   enabled: false
+  # profiles:
+  #   enabled: false
+  receivers:
+    grafanaCloudMetrics:
+      enabled: false
+    deployGrafanaAgentService: true
+  extraConfig: ""
+  opencost:
+    enabled: false
+  prometheus-node-exporter:
+    enabled: false
+  extraObjects: []

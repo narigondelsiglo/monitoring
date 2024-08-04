@@ -1,9 +1,7 @@
 global:
-  clusterName: my-cluster
   domain: example.com
 
 loki:
-  enabled: false
   loki:
     structuredConfig:
       limits_config:
@@ -39,13 +37,13 @@ kube-prometheus-stack:
       # annotations:
       #   cert-manager.io/cluster-issuer: default
       hosts:
-      - grafana.{{ include "domain" . }}
+      - grafana.{{ .Values.global.domain }}
       paths:
         - /
       tls:
       - secretName: grafana-general-tls
         hosts:
-        - grafana.{{ include "domain" . }}
+        - grafana.{{ .Values.global.domain }}
   prometheus:
     ingress:
       enabled: true
@@ -53,13 +51,13 @@ kube-prometheus-stack:
       #   cert-manager.io/cluster-issuer: default
       #   traefik.ingress.kubernetes.io/router.middlewares: kube-system-authentik@kubernetescrd
       hosts:
-      - prometheus.{{ include "domain" . }}
+      - prometheus.{{ .Values.global.domain }}
       paths:
         - /
       tls:
       - secretName: prometheus-general-tls
         hosts:
-        - prometheus.{{ include "domain" . }}
+        - prometheus.{{ .Values.global.domain }}
   prometheusOperator:
     tls:
       enabled: false
@@ -77,7 +75,7 @@ kube-prometheus-stack:
 
 k8s-monitoring:
   cluster:
-    name: {{ include "cluster.name" . }}
+    name: "my-cluster"
 
   metrics:
     cadvisor:

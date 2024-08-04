@@ -68,3 +68,7 @@ Create the name of the service account to use
 {{- define "cluster.name" -}}
 {{- .Values.global.clusterName }}
 {{- end }}
+
+{{- define "loki.url" -}}
+http://loki-loki-distributed-gatewayalvaro
+{{- end }}
